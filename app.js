@@ -1,6 +1,6 @@
 // FocusTrack MVP. Starts in local mode; configure Supabase below to enable cloud sync.
 const SUPABASE_URL = "https://xmtbpqovwvpdpyxmrbvx.supabase.co";
-const SUPABASE_ANON_KEY = "sb_secret_Arhkn9TAxd-w7aoEabtiSA_IiDolwnN";
+const SUPABASE_ANON_KEY = "sb_publishable_1qPBV0Ni6MFssahQk0LnjQ_C-HFOX8o";
 const cloudEnabled = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("YOUR_") && !SUPABASE_ANON_KEY.includes("YOUR_");
 const sb = cloudEnabled ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
