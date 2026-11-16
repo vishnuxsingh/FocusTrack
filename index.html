@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131d">
+  <title>FocusTrack — Personal Productivity</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">F</span><span>FocusTrack</span></a>
+      <div class="side-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link active" href="#overview"><span>▦</span> Overview</a>
+        <a class="nav-link" href="#daily"><span>☑</span> Daily goals</a>
+        <a class="nav-link" href="#analytics"><span>▥</span> Analytics</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user-chip"><div class="avatar" id="avatar">G</div><div><strong id="user-label">Guest mode</strong><small id="user-email">Local device storage</small></div></div>
+        <button class="text-button" id="auth-open">Sign in / Sync</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow" id="today-label">YOUR PERSONAL SPACE</div><h1>Overview</h1></div>
+        <div class="top-actions">
+          <button class="icon-button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">☼</button>
+          <button class="button button-primary" id="quick-add">＋ Add today's data</button>
+        </div>
+      </header>
+
+      <section class="welcome-row" id="overview">
+        <div><p class="muted">YOUR CONSISTENCY, ONE DAY AT A TIME</p><h2>Make today count<span class="accent">.</span></h2><p class="muted">Small actions, repeated daily, create remarkable progress.</p></div>
+        <div class="date-pill" id="date-pill">Today</div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Screen time</span><span class="stat-icon orange">▣</span></div><div class="stat-value" id="screen-stat">—</div><div class="stat-foot" id="screen-foot">Today's mobile usage</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Study time</span><span class="stat-icon blue">▤</span></div><div class="stat-value" id="study-stat">—</div><div class="stat-foot" id="study-foot">Today's focused learning</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Current streak</span><span class="stat-icon flame">♨</span></div><div class="stat-value" id="current-streak">0 <small>days</small></div><div class="stat-foot">Consecutive completed days</div></article>
+        <article class="stat-card"><div class="stat-top"><span>Best streak</span><span class="stat-icon green">✦</span></div><div class="stat-value" id="best-streak">0 <small>days</small></div><div class="stat-foot" id="total-days">0 total completed days</div></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel" id="daily">
+          <div class="panel-heading"><div><div class="eyebrow">TODAY'S PLAN</div><h3>Daily goals</h3></div><button class="button button-small button-quiet" id="add-goal">＋ Add goal</button></div>
+          <div class="goal-progress"><div><strong id="goal-count">0 of 0 completed</strong><span id="goal-percent">0%</span></div><div class="progress-track"><div class="progress-fill" id="goal-progress-fill"></div></div></div>
+          <div id="goal-list" class="goal-list"><div class="empty-state">No goals yet. Add your first goal for today.</div></div>
+          <div class="goal-tip">Tip: Set your goals in the morning, then check them off as you go.</div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading"><div><div class="eyebrow">DAILY CHECK-IN</div><h3>Today's numbers</h3></div><span class="live-dot">MANUAL</span></div>
+          <form id="record-form" class="form-stack">
+            <label>Mobile screen time <span class="field-hint">Hours and minutes</span></label>
+            <div class="two-inputs"><input id="screen-hours" type="number" min="0" max="24" placeholder="Hours" value="0"><input id="screen-minutes" type="number" min="0" max="59" placeholder="Minutes" value="0"></div>
+            <label>Study time <span class="field-hint">Hours and minutes</span></label>
+            <div class="two-inputs"><input id="study-hours" type="number" min="0" max="24" placeholder="Hours" value="0"><input id="study-minutes" type="number" min="0" max="59" placeholder="Minutes" value="0"></div>
+            <div class="two-inputs target-inputs"><div><label for="study-target">Study target (hours)</label><input id="study-target" type="number" min="0.5" max="24" step="0.5" value="4"></div><div><label for="screen-limit">Screen limit (hours)</label><input id="screen-limit" type="number" min="0.5" max="24" step="0.5" value="3"></div></div>
+            <button class="button button-primary full-width" type="submit">Save today's check-in</button>
+            <p class="form-message" id="record-message" aria-live="polite"></p>
+          </form>
+        </article>
+      </section>
+
+      <section class="panel analytics-panel" id="analytics">
+        <div class="panel-heading"><div><div class="eyebrow">YOUR TRENDS</div><h3>Progress analytics</h3></div><select id="chart-range" aria-label="Chart range"><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></div>
+        <div class="chart-legend"><span><i class="legend-dot study-dot"></i> Study hours</span><span><i class="legend-dot screen-dot"></i> Screen time</span></div>
+        <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
+      </section>
+
+      <footer>Built for consistency, not perfection. <span>FocusTrack · Personal productivity</span></footer>
+    </main>
+  </div>
+
+  <dialog id="goal-dialog" class="modal">
+    <form method="dialog" id="goal-form">
+      <div class="modal-heading"><div><div class="eyebrow">DAILY PLAN</div><h3>Add a goal</h3></div><button class="icon-button" value="cancel" aria-label="Close">×</button></div>
+      <label for="goal-title">What do you want to accomplish?</label><input id="goal-title" maxlength="100" required placeholder="e.g. Solve 3 DSA problems">
+      <label class="check-label"><input id="goal-mandatory" type="checkbox" checked> Mandatory goal (counts towards streak)</label>
+      <div class="modal-actions"><button class="button button-quiet" value="cancel">Cancel</button><button class="button button-primary" id="save-goal" type="submit">Add goal</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="auth-dialog" class="modal">
+    <form id="auth-form">
+      <div class="modal-heading"><div><div class="eyebrow">CLOUD SYNC</div><h3>Sign in to FocusTrack</h3></div><button class="icon-button" type="button" id="auth-close">×</button></div>
+      <p class="muted small">Use an account to sync your goals and records across devices. You can also keep using local mode.</p>
+      <label for="auth-email">Email</label><input id="auth-email" type="email" required placeholder="you@example.com">
+      <label for="auth-password">Password</label><input id="auth-password" type="password" minlength="6" required placeholder="At least 6 characters">
+      <div class="modal-actions"><button class="button button-quiet" type="button" id="sign-out">Sign out</button><button class="button button-quiet" type="button" id="sign-up">Create account</button><button class="button button-primary" type="submit">Sign in</button></div>
+      <p class="form-message" id="auth-message" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
